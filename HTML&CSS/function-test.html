@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Function testing</title>
+    </head>
+    <script>
+      function add7(num) {
+          return num + 7;
+      }
+
+      function multiply(num1, num2) {
+          return num1 * num2;
+      }
+
+      function capitalize(string) {
+          let str = string.toLowerCase().split('')
+          str[0] = str[0].toUpperCase();
+          return str.join(''); 
+      }
+
+      function lastLetter(string) {
+          let strArray = string.split('');
+          return strArray.pop();
+      }
+        
+    console.log(add7(10));
+    console.log(multiply(2, 5));
+    console.log(capitalize('aMazINg'));
+    console.log(lastLetter('hail'));
+
+
+    </script>
+</html>

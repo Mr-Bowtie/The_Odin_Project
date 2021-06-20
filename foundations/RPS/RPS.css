@@ -1,0 +1,157 @@
+.playerTally {
+    order: 1;
+    align-self: center;
+    font-size: 5em;
+}
+
+.computerTally {
+    order: 3;
+    align-self: center;
+    font-size: 5em;
+}
+
+body {
+    background-color: #424140;
+    color: #ffdb5b;
+    height: 75vh;
+    width: 100%; 
+}
+
+#title {
+    display: flex;
+    justify-content: center;
+    margin: 10% auto 0px;
+    font-size: 4em;
+    width: 100%;
+    height: 10%;
+}
+
+h2 {
+    font-size: 3em; 
+}
+
+.buttonDiv {
+    height: 30%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    margin: 0px auto 15px;
+    max-width: 700px
+    ;
+}
+
+#scoreboard {
+    height: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    max-width: 800px;
+    max-height: 800px;
+    margin: 20px auto;
+
+}
+
+#rock {
+    background-image: url("RPS_icons/rock_big.png"); 
+    background-repeat: no-repeat;
+    background-position: center;
+}
+#paper {
+    background-image: url("RPS_icons/paper_big.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+#scissors {
+    background-image: url("RPS_icons/scissors_big.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+button {
+    height: 75px;
+    width: 75px;
+    border: none;
+    transition-duration: 0.2s;
+}
+
+button:hover {
+   border: 4px solid #f5f3f1;
+
+}
+
+#score {
+    width: 100%;
+    height: 50%; 
+    margin-top: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.roundResults {
+    width: 100%;
+    height: 50%;
+    display: grid;
+    grid-template-columns: 35% 30% 35%;
+    grid-template-rows: auto;
+    grid-template-areas: 
+    "header header header"
+    "playerRound . compRound"
+    "playerChoice tie compChoice";
+    row-gap: 20px;
+}
+
+#playerScore {
+    grid-area: playerScore;
+}
+
+#compScore {
+    grid-area: compScore;
+}
+
+#roundHead {
+    grid-area: header;
+    justify-self: center;
+}
+
+#playerRound {
+    grid-area: playerRound;
+    justify-self: center;
+    font-size: 2em;
+}
+
+#compRound {
+    grid-area: compRound;
+    justify-self: center;
+    font-size: 2em;
+}
+
+#tie {
+    grid-area: tie;
+    justify-self: center;
+    align-self: start;
+    font-size: 2.5em;
+}
+
+#playerChoice {
+    grid-area: playerChoice;
+    width: 64px;
+    height: 64px;
+    justify-self: center;
+   
+}
+
+#computerChoice {
+    grid-area: compChoice;
+    width: 64px;
+    height: 64px;
+    justify-self: center;
+   
+}
+
+#scoreTitle {
+   order: 2; 
+}
+
