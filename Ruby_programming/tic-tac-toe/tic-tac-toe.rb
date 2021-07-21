@@ -38,8 +38,8 @@ class Board
     positions = self.board_positions
     p positions
     WINNING_POSITIONS.each do |group|
-      if group.all? { |i| positions[i] == "X" } || group.all? { |i| positions[i] == "O" }
-        # binding.pry
+      # binding.pry
+      if group.all? { |i| positions[i - 1] == "X" } || group.all? { |i| positions[i - 1] == "O" }
         return true
       end
     end
