@@ -2,11 +2,12 @@ require "pry"
 
 class Board
   WINNING_POSITIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
-  attr_reader :board_positions, :size, :valid_positions
+  attr_reader :size, :valid_positions
+  attr_accessor :board_positions
 
   def initialize(size = 3)
     @size = size
-    @board_positions = (1..(size ** 2)).to_a.map { |el| el }
+    @board_positions = (1..(size ** 2)).to_a
   end
 
   def calc_valid_positions #* looks through current board and returns a new array of all the numbers that are left, disregarding strings
@@ -32,19 +33,32 @@ class Board
     display_separator()
     puts ""
   end
+
+  def board_full?
+    self.calc_valid_positions.empty?
+  end
+
+  def reset_board
+    self.board_positions = (1..(size ** 2)).to_a
+  end
 end
 
 class Player
-  attr_reader :name
-  attr_accessor :board, :symbol, :first_move, :winner
+  attr_accessor :board, :symbol, :first_move, :winner, :name, :score
 
-  def initialize(name, board)
-    @name = name
+  def initialize(board)
+    @name = ""
     @score = 0
     @first_move = false
     @board = board
     @symbol = "X"
     @winner = false
+  end
+
+  def get_name
+    puts "What is your name?"
+    choice = gets.chomp
+    self.name = choice
   end
 
   def go_first
@@ -69,18 +83,20 @@ class Player
     false #* returns false if there is no winner or tie
   end
 
-  def board_full?
-    self.board.calc_valid_positions.empty?
+  def reset_player
+    self.winner = false
+    self.score = 0
+    self.first_move = false
   end
 end
 
 class Computer < Player
-  attr_reader :name
-  attr_accessor :board
+  attr_accessor :board, :name
 
-  def initialize(name, board)
+  def initialize(board)
     super
     @symbol = "O"
+    @name = "Computer "
   end
 
   def turn_action
@@ -96,6 +112,10 @@ class Game
     @board = board
     @player1 = player1
     @player2 = player2
+  end
+
+  def welcome
+    puts "Welcome to Tic-Tac-Toe, lets play!"
   end
 
   # def calc_play_order(player, computer)
@@ -122,11 +142,11 @@ class Game
     loop do
       self.board.display_board
       self.player1.turn_action
-      if self.player1.winner? || self.player1.board_full?
+      if self.player1.winner? || self.board.board_full?
         break
       end
       self.player2.turn_action
-      if self.player2.winner? || self.player2.board_full?
+      if self.player2.winner? || self.board.board_full?
         break
       end
     end
@@ -142,12 +162,44 @@ class Game
       puts "Cat Scratch"
     end
   end
+
+  def play_again?
+    puts "Would you like to play again? ( yes | no )"
+    loop do
+      choice = gets.chomp.downcase
+      if valid_choice?(choice)
+        if choice == "yes" || choice == "y"
+          return true
+        elsif choice == "no" || choice == "n"
+          return false
+        end
+      end
+      puts "Invalid input. Valid options: yes, y, no, n"
+    end
+  end
+
+  def valid_choice?(choice)
+    %w(yes y no n).include?(choice)
+  end
 end
 
 board = Board.new
-human = Player.new("Ian", board)
-computer = Computer.new("Computer", board)
+human = Player.new(board)
+computer = Computer.new(board)
 game = Game.new(board, human, computer)
 
-game.play_round
-game.display_round_outcome
+game.welcome
+human.get_name
+
+loop do
+  game.play_round
+  game.display_round_outcome
+
+  unless game.play_again?
+    break
+  else
+    human.reset_player
+    computer.reset_player
+    board.reset_board
+  end
+end
