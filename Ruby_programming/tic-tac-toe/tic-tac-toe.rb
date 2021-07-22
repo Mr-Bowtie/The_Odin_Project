@@ -9,7 +9,7 @@ class Board
     @board_positions = (1..(size ** 2)).to_a.map { |el| el }
   end
 
-  def calc_valid_positions
+  def calc_valid_positions #* looks through current board and returns a new array of all the numbers that are left, disregarding strings
     self.board_positions.select { |el| (1..(size ** 2)).include?(el) }
   end
 
@@ -33,17 +33,21 @@ class Board
     puts ""
   end
 
-  def game_over?
-    return true if self.calc_valid_positions == []
+  def round_outcome
+    return "Tie" if self.calc_valid_positions == [] #* tie when there are no valid positions left
     positions = self.board_positions
-    p positions
     WINNING_POSITIONS.each do |group|
-      # binding.pry
-      if group.all? { |i| positions[i - 1] == "X" } || group.all? { |i| positions[i - 1] == "O" }
-        return true
+      if group.all? { |i| positions[i - 1] == "X" }
+        return "Player"
+      elsif group.all? { |i| positions[i - 1] == "O" }
+        return "Computer"
       end
     end
-    false
+    nil #* returns nil if there is no winner or tie
+  end
+
+  def round_over?
+    !!round_outcome()
   end
 end
 
@@ -56,7 +60,7 @@ class Player
     @score = 0
     @first_move = false
     @board = board
-    @symbol = "O"
+    @symbol = "X"
   end
 
   def go_first
@@ -74,21 +78,64 @@ end
 
 class Computer < Player
   attr_reader :name
+  attr_accessor :board
 
-  def initialize(name = "Computer")
+  def initialize(name, board)
     super
+    @symbol = "O"
+  end
+
+  def take_turn
+    choice = self.board.calc_valid_positions.sample
+    self.board.board_positions[choice - 1] = self.symbol
   end
 end
 
-def play_round(player, board)
+def calc_play_order(player, computer)
+  order = []
+  puts "Would you like to go first, second, or flip a coin?"
+  choice = gets.chomp
+  case choice
+  when "first"
+    order << player << computer
+    player.go_first
+  when "second"
+    order << computer << player
+  when "flip a coin"
+    players = [player, computer]
+    first = players.sample.pop
+    second = players.pop
+    first.go_first
+    orde << first << second
+  end
+  order
+end
+
+def play_round(player, computer, board)
   loop do
     board.display_board
     player.take_turn
-    # binding.pry
-    break if board.game_over?
+    break if board.round_over?
+    computer.take_turn
+    break if board.round_over?
+  end
+  board.display_board
+end
+
+def display_round_outcome(board)
+  case board.round_outcome
+  when "Player"
+    puts "You win!"
+  when "Computer"
+    puts "The Computer wins."
+  when "Tie"
+    puts "Cat Scratch!"
   end
 end
 
 board = Board.new
-ian = Player.new("Ian", board)
-play_round(ian, board)
+user = Player.new("Ian", board)
+computer = Computer.new("Computer", board)
+# binding.pry
+play_round(user, computer, board)
+display_round_outcome(board)
