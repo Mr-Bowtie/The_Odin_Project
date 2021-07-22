@@ -68,9 +68,20 @@ class Player
 
   def turn_action
     puts "Choose an open position on the board #{self.board.calc_valid_positions}" #todo: validate input and update available position
-    choice = gets.chomp.to_i
-    position = self.board.board_positions.index(choice)
-    self.board.board_positions[position] = self.symbol
+    loop do
+      choice = gets.chomp.to_i
+      position = self.board.board_positions.index(choice)
+      if valid_action?(choice)
+        self.board.board_positions[position] = self.symbol
+        break
+      else
+        puts "Invalid input: Choose a valid position #{self.board.calc_valid_positions}"
+      end
+    end
+  end
+
+  def valid_action?(move)
+    self.board.calc_valid_positions.include?(move)
   end
 
   def winner?
@@ -181,6 +192,10 @@ class Game
   def valid_choice?(choice)
     %w(yes y no n).include?(choice)
   end
+
+  def display_game_over
+    puts "Thanks for playing Tic-Tac-Toe, Goodbye #{self.player1.name}!"
+  end
 end
 
 board = Board.new
@@ -203,3 +218,5 @@ loop do
     board.reset_board
   end
 end
+
+game.display_game_over
