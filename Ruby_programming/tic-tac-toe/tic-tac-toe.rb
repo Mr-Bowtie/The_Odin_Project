@@ -1,7 +1,7 @@
 require "pry"
 
 class Board
-  WINNING_POSITIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 9], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
+  WINNING_POSITIONS = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [1, 4, 7], [2, 5, 8], [3, 6, 9], [1, 5, 9], [3, 5, 7]]
   attr_reader :board_positions, :size, :valid_positions
 
   def initialize(size = 3)
@@ -32,28 +32,11 @@ class Board
     display_separator()
     puts ""
   end
-
-  def round_outcome
-    return "Tie" if self.calc_valid_positions == [] #* tie when there are no valid positions left
-    positions = self.board_positions
-    WINNING_POSITIONS.each do |group|
-      if group.all? { |i| positions[i - 1] == "X" }
-        return "Player"
-      elsif group.all? { |i| positions[i - 1] == "O" }
-        return "Computer"
-      end
-    end
-    nil #* returns nil if there is no winner or tie
-  end
-
-  def round_over?
-    !!round_outcome()
-  end
 end
 
 class Player
   attr_reader :name
-  attr_accessor :board, :symbol, :first_move
+  attr_accessor :board, :symbol, :first_move, :winner
 
   def initialize(name, board)
     @name = name
@@ -61,6 +44,7 @@ class Player
     @first_move = false
     @board = board
     @symbol = "X"
+    @winner = false
   end
 
   def go_first
@@ -68,11 +52,25 @@ class Player
     self.symbol = "X"
   end
 
-  def take_turn
+  def turn_action
     puts "Choose an open position on the board #{self.board.calc_valid_positions}" #todo: validate input and update available position
     choice = gets.chomp.to_i
     position = self.board.board_positions.index(choice)
     self.board.board_positions[position] = self.symbol
+  end
+
+  def winner?
+    positions = self.board.board_positions
+    Board::WINNING_POSITIONS.each do |group|
+      if group.all? { |i| positions[i - 1] == self.symbol }
+        return self.winner = true
+      end
+    end
+    false #* returns false if there is no winner or tie
+  end
+
+  def board_full?
+    self.board.calc_valid_positions.empty?
   end
 end
 
@@ -85,57 +83,71 @@ class Computer < Player
     @symbol = "O"
   end
 
-  def take_turn
+  def turn_action
     choice = self.board.calc_valid_positions.sample
     self.board.board_positions[choice - 1] = self.symbol
   end
 end
 
-def calc_play_order(player, computer)
-  order = []
-  puts "Would you like to go first, second, or flip a coin?"
-  choice = gets.chomp
-  case choice
-  when "first"
-    order << player << computer
-    player.go_first
-  when "second"
-    order << computer << player
-  when "flip a coin"
-    players = [player, computer]
-    first = players.sample.pop
-    second = players.pop
-    first.go_first
-    orde << first << second
-  end
-  order
-end
+class Game
+  attr_accessor :board, :player1, :player2
 
-def play_round(player, computer, board)
-  loop do
-    board.display_board
-    player.take_turn
-    break if board.round_over?
-    computer.take_turn
-    break if board.round_over?
+  def initialize(board, player1, player2)
+    @board = board
+    @player1 = player1
+    @player2 = player2
   end
-  board.display_board
-end
 
-def display_round_outcome(board)
-  case board.round_outcome
-  when "Player"
-    puts "You win!"
-  when "Computer"
-    puts "The Computer wins."
-  when "Tie"
-    puts "Cat Scratch!"
+  # def calc_play_order(player, computer)
+  #   order = []
+  #   puts "Would you like to go first, second, or flip a coin?"
+  #   choice = gets.chomp
+  #   case choice
+  #   when "first"
+  #     order << player << computer
+  #     player.go_first
+  #   when "second"
+  #     order << computer << player
+  #   when "flip a coin"
+  #     players = [player, computer]
+  #     first = players.sample.pop
+  #     second = players.pop
+  #     first.go_first
+  #     orde << first << second
+  #   end
+  #   order
+  # end
+
+  def play_round
+    loop do
+      self.board.display_board
+      self.player1.turn_action
+      if self.player1.winner? || self.player1.board_full?
+        break
+      end
+      self.player2.turn_action
+      if self.player2.winner? || self.player2.board_full?
+        break
+      end
+    end
+    self.board.display_board
+  end
+
+  def display_round_outcome
+    if self.player1.winner
+      puts "#{self.player1.name} Wins!"
+    elsif self.player2.winner
+      puts "#{self.player2.name} Wins!"
+    else
+      puts "Cat Scratch"
+    end
   end
 end
 
 board = Board.new
-user = Player.new("Ian", board)
+human = Player.new("Ian", board)
 computer = Computer.new("Computer", board)
-# binding.pry
-play_round(user, computer, board)
-display_round_outcome(board)
+game = Game.new(board, human, computer)
+
+game.play_round
+game.display_round_outcome
