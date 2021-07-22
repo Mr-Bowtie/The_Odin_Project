@@ -14,24 +14,44 @@ class Board
     self.board_positions.select { |el| (1..(size ** 2)).include?(el) }
   end
 
-  def display_separator
-    puts "-------------"
+  def display_middle_separator
+    puts "|     |     |     | "
+    puts "-------------------"
+    puts "|     |     |     | "
+  end
+
+  def display_top_separator
+    puts ""
+    puts "-------------------"
+    puts "|     |     |     | "
+  end
+
+  def display_bottom_separator
+    puts "|     |     |     | "
+    puts "-------------------"
+    puts ""
   end
 
   def display_boxes(s1, s2, s3)
-    puts "| #{s1} | #{s2} | #{s3} |"
+    boxes = [s1, s2, s3]
+    boxes.each do |s|
+      if s.is_a?(Integer)
+        boxes[boxes.index(s)] = "[" + s.to_s + "]"
+      else
+        boxes[boxes.index(s)] = " " + s + " "
+      end
+    end
+    puts "| #{boxes[0]} | #{boxes[1]} | #{boxes[2]} |"
   end
 
   def display_board #todo: make the position numbers a different color / opacity than the players symbol
-    puts ""
-    display_separator()
+    display_top_separator()
     display_boxes(@board_positions[0], @board_positions[1], @board_positions[2])
-    display_separator()
+    display_middle_separator()
     display_boxes(@board_positions[3], @board_positions[4], @board_positions[5])
-    display_separator()
+    display_middle_separator()
     display_boxes(@board_positions[6], @board_positions[7], @board_positions[8])
-    display_separator()
-    puts ""
+    display_bottom_separator()
   end
 
   def board_full?
